@@ -6,6 +6,7 @@ import time
 
 import requests
 
+
 # Function that handles installing the mods to a client.
 def installMods(_dir):
     for i in data["modList"]:
