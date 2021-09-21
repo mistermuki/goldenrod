@@ -6,7 +6,7 @@ import time
 
 import requests
 
-
+# Function that handles installing the mods to a client.
 def installMods(_dir):
     for i in data["modList"]:
         if not os.path.exists("./jarCache/"):
@@ -71,7 +71,7 @@ def installMods(_dir):
     time.sleep(5)
     sys.exit(0)
 
-
+# Function that handles installing the profile mods on a server.
 def serverInstall(_dire):
     for i in data["modList"]:
         if not os.path.exists("./jarCache/"):
