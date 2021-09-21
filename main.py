@@ -15,14 +15,12 @@ def installMods(_dir):
 
         if not os.path.exists("./jarCache/" + str(data["shortName"])):
             os.mkdir("./jarCache/" + str(data["shortName"]))
-            print("Creating JAR Cache:" +
-                  "./jarCache/" + str(data["shortName"]))
+            print("Creating JAR Cache:" + "./jarCache/" + str(data["shortName"]))
             time.sleep(0.3)
 
         tempMod = requests.get(data["modList"][i][0]["link"])
         print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
-        cacheDirectory = "./jarCache/" + \
-            str(data["shortName"]) + "/" + str(i) + ".jar"
+        cacheDirectory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
         time.sleep(0.3)
 
         with open(cacheDirectory, "wb") as f:
@@ -32,8 +30,8 @@ def installMods(_dir):
             time.sleep(0.1)
 
     print("Installing mods to mods Directory...")
-    #appData = os.getenv('APPDATA')
-    #mcDir = appData + "\.minecraft"
+    # appData = os.getenv('APPDATA')
+    # mcDir = appData + "\.minecraft"
     modsDir = _dir + r"/mods"
 
     if not os.path.exists(modsDir):
@@ -48,19 +46,12 @@ def installMods(_dir):
         print("Creating mods Directory: " + modsDir)
         time.sleep(1)
 
-    #workDir = str(pathlib.Path().resolve())
+    # workDir = str(pathlib.Path().resolve())
     print("Loading files into mods folder...")
     for x in os.listdir("./jarCache/" + data["shortName"]):
         if x.endswith(".jar"):
             print("Moving: " + x)
-            shutil.move(
-                "./jarCache/" +
-                data["shortName"] +
-                "/" +
-                x,
-                modsDir +
-                "/" +
-                x)
+            shutil.move("./jarCache/" + data["shortName"] + "/" + x, modsDir + "/" + x)
             print("Succesfully moved: " + x)
             time.sleep(1)
 
@@ -80,14 +71,12 @@ def serverInstall(_dire):
 
         if not os.path.exists("./jarCache/" + str(data["shortName"])):
             os.mkdir("./jarCache/" + str(data["shortName"]))
-            print("Creating JAR Cache:" +
-                  "./jarCache/" + str(data["shortName"]))
+            print("Creating JAR Cache:" + "./jarCache/" + str(data["shortName"]))
             time.sleep(0.3)
 
         tempMod = requests.get(data["modList"][i][0]["link"])
         print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
-        cacheDirectory = "./jarCache/" + \
-            str(data["shortName"]) + "/" + str(i) + ".jar"
+        cacheDirectory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
         time.sleep(0.3)
 
         with open(cacheDirectory, "wb") as f:
@@ -100,14 +89,7 @@ def serverInstall(_dire):
     for x in os.listdir("./jarCache/" + data["shortName"]):
         if x.endswith(".jar"):
             print("Moving: " + x)
-            shutil.move(
-                "./jarCache/" +
-                data["shortName"] +
-                "/" +
-                x,
-                _dire +
-                "/" +
-                x)
+            shutil.move("./jarCache/" + data["shortName"] + "/" + x, _dire + "/" + x)
             print("Succesfully moved: " + x)
             time.sleep(1)
 
@@ -140,10 +122,10 @@ while True:
     if command[0] == "help":
         print("help - Gives you this handy list.")
         print("download [link] - downloads a server profile locally.")
+        print("load [profile] [directory] - loads & installs a Forge Modpack Profile.")
         print(
-            "load [profile] [directory] - loads & installs a Forge Modpack Profile.")
-        print(
-            "server [profile] [directory] - for quick downloading Modpacks for Server Use.")
+            "server [profile] [directory] - for quick downloading Modpacks for Server Use."
+        )
         continue
 
     if command[0] == "download":
@@ -166,20 +148,19 @@ while True:
         downloadData = json.load(f2)
         f2.close()
         shutil.move(
-            "./tempProfile.json",
-            "./profiles/" +
-            downloadData["shortName"] +
-            ".json")
+            "./tempProfile.json", "./profiles/" + downloadData["shortName"] + ".json"
+        )
         print(
-            "Your profile, " +
-            downloadData["shortName"] +
-            ".json has been saved! You can load it using the load command.")
+            "Your profile, "
+            + downloadData["shortName"]
+            + ".json has been saved! You can load it using the load command."
+        )
 
     if command[0] == "server":
         print("Server.")
-        if os.path.exists('./profiles/' + command[1] + ".json"):
+        if os.path.exists("./profiles/" + command[1] + ".json"):
             print("Server.")
-            f1 = open('./profiles/' + command[1] + ".json")
+            f1 = open("./profiles/" + command[1] + ".json")
             print("Server.")
             data = json.load(f1)
             print("Server.")
@@ -191,8 +172,8 @@ while True:
                     serverInstall(command[2])
 
     if command[0] == "load":
-        if os.path.exists('./profiles/' + command[1] + ".json"):
-            f1 = open('./profiles/' + command[1] + ".json")
+        if os.path.exists("./profiles/" + command[1] + ".json"):
+            f1 = open("./profiles/" + command[1] + ".json")
             data = json.load(f1)
             try:
                 if command[2]:
@@ -200,10 +181,10 @@ while True:
                         print("This directory does not exist.")
                         continue
             except BaseException:
-                appData = os.getenv('APPDATA')
+                appData = os.getenv("APPDATA")
                 mcDir = appData + r"/.minecraft"
                 installMods(mcDir)
 
-        elif not os.path.exists('./profiles/' + command[1] + ".json"):
+        elif not os.path.exists("./profiles/" + command[1] + ".json"):
             print("This profile does not exist. Try again.")
             continue
