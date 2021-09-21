@@ -8,7 +8,7 @@ import requests
 
 
 def installMods(_dir):
-    """ "Handles installing mods from an Anvil profile to a client."""
+    """Handles installing mods from an Anvil profile to a client."""
     for i in data["modList"]:
         if not os.path.exists("./jarCache/"):
             os.mkdir("./jarCache/")
@@ -65,7 +65,7 @@ def installMods(_dir):
 
 
 def serverInstall(_dire):
-    """ "Handles installing mods from an Anvil profile onto a server."""
+    """Handles installing mods from an Anvil profile onto a server."""
     for i in data["modList"]:
         if not os.path.exists("./jarCache/"):
             os.mkdir("./jarCache/")
