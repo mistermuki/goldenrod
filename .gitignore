@@ -1,2 +1,5 @@
 profiles/
 jarCache/
+build/
+dist/
+Anvil.spec
