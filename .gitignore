@@ -3,3 +3,4 @@ jarCache/
 build/
 dist/
 Anvil.spec
+src/__pycache__
