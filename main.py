@@ -1,9 +1,10 @@
-import json
-import requests
 import os
 import sys
 import shutil
 import time
+import json
+import requests
+
 
 def installMods(_dir):
     for i in data["modList"]:
@@ -13,15 +14,17 @@ def installMods(_dir):
 
         if not os.path.exists("./jarCache/" + str(data["shortName"])):
             os.mkdir("./jarCache/" + str(data["shortName"]))
-            print("Creating JAR Cache:" + "./jarCache/" + str(data["shortName"]))
+            print("Creating JAR Cache:" +
+                  "./jarCache/" + str(data["shortName"]))
             time.sleep(0.3)
 
         tempMod = requests.get(data["modList"][i][0]["link"])
         print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
-        cacheDirectory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
+        cacheDirectory = "./jarCache/" + \
+            str(data["shortName"]) + "/" + str(i) + ".jar"
         time.sleep(0.3)
 
-        with open(cacheDirectory,"wb") as f:
+        with open(cacheDirectory, "wb") as f:
             print("Saving " + i + "...")
             f.write(tempMod.content)
             print("Successfully saved: " + i)
@@ -30,12 +33,12 @@ def installMods(_dir):
     print("Installing mods to mods Directory...")
     #appData = os.getenv('APPDATA')
     #mcDir = appData + "\.minecraft"
-    modsDir = _dir + "\mods"
+    modsDir = _dir + r"/mods"
 
     if not os.path.exists(modsDir):
-            os.mkdir(modsDir)
-            print("Creating mods Directory: " + modsDir)
-            time.sleep(1)
+        os.mkdir(modsDir)
+        print("Creating mods Directory: " + modsDir)
+        time.sleep(1)
     elif os.path.isdir(modsDir):
         print("Cleaning mods Directory...")
         time.sleep(1)
@@ -49,7 +52,14 @@ def installMods(_dir):
     for x in os.listdir("./jarCache/" + data["shortName"]):
         if x.endswith(".jar"):
             print("Moving: " + x)
-            shutil.move("./jarCache/" + data["shortName"] + "/" + x, modsDir + "/" + x)
+            shutil.move(
+                "./jarCache/" +
+                data["shortName"] +
+                "/" +
+                x,
+                modsDir +
+                "/" +
+                x)
             print("Succesfully moved: " + x)
             time.sleep(1)
 
@@ -59,6 +69,7 @@ def installMods(_dir):
     print("Thank you for using Anvil.")
     time.sleep(5)
     sys.exit(0)
+
 
 def serverInstall(_dire):
     for i in data["modList"]:
@@ -68,15 +79,17 @@ def serverInstall(_dire):
 
         if not os.path.exists("./jarCache/" + str(data["shortName"])):
             os.mkdir("./jarCache/" + str(data["shortName"]))
-            print("Creating JAR Cache:" + "./jarCache/" + str(data["shortName"]))
+            print("Creating JAR Cache:" +
+                  "./jarCache/" + str(data["shortName"]))
             time.sleep(0.3)
 
         tempMod = requests.get(data["modList"][i][0]["link"])
         print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
-        cacheDirectory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
+        cacheDirectory = "./jarCache/" + \
+            str(data["shortName"]) + "/" + str(i) + ".jar"
         time.sleep(0.3)
 
-        with open(cacheDirectory,"wb") as f:
+        with open(cacheDirectory, "wb") as f:
             print("Saving " + i + "...")
             f.write(tempMod.content)
             print("Successfully saved: " + i)
@@ -86,7 +99,14 @@ def serverInstall(_dire):
     for x in os.listdir("./jarCache/" + data["shortName"]):
         if x.endswith(".jar"):
             print("Moving: " + x)
-            shutil.move("./jarCache/" + data["shortName"] + "/" + x, _dire + "/" + x)
+            shutil.move(
+                "./jarCache/" +
+                data["shortName"] +
+                "/" +
+                x,
+                _dire +
+                "/" +
+                x)
             print("Succesfully moved: " + x)
             time.sleep(1)
 
@@ -97,19 +117,20 @@ def serverInstall(_dire):
     time.sleep(5)
     sys.exit(0)
 
+
 print("\n")
-print("  /$$$$$$  /$$   /$$ /$$    /$$ /$$$$$$ /$$ ")     
-print(" /$$__  $$| $$$ | $$| $$   | $$|_  $$_/| $$ ")
-print("| $$  \ $$| $$$$| $$| $$   | $$  | $$  | $$ ")
-print("| $$$$$$$$| $$ $$ $$|  $$ / $$/  | $$  | $$ ")
-print("| $$__  $$| $$  $$$$ \  $$ $$/   | $$  | $$ ")
-print("| $$  | $$| $$\  $$$  \  $$$/    | $$  | $$ ")
-print("| $$  | $$| $$ \  $$   \  $/    /$$$$$$| $$$$$$$$")
-print("|__/  |__/|__/  \__/    \_/    |______/|________/")
-print("Version: 0.1")
-print("\n")
-print("Anvil has successfully launched.")
-print("You can use the command, help for a list of commands")
+print(r"  /$$$$$$  /$$   /$$ /$$    /$$ /$$$$$$ /$$ ")
+print(r" /$$__  $$| $$$ | $$| $$   | $$|_  $$_/| $$ ")
+print(r"| $$  \ $$| $$$$| $$| $$   | $$  | $$  | $$ ")
+print(r"| $$$$$$$$| $$ $$ $$|  $$ / $$/  | $$  | $$ ")
+print(r"| $$__  $$| $$  $$$$ \  $$ $$/   | $$  | $$ ")
+print(r"| $$  | $$| $$\  $$$  \  $$$/    | $$  | $$ ")
+print(r"| $$  | $$| $$ \  $$   \  $/    /$$$$$$| $$$$$$$$")
+print(r"|__/  |__/|__/  \__/    \_/    |______/|________/")
+print(r"Version: 0.1")
+print(r"\n")
+print(r"Anvil has successfully launched.")
+print(r"You can use the command, help for a list of commands")
 
 while True:
     commandIn = input()
@@ -118,34 +139,41 @@ while True:
     if command[0] == "help":
         print("help - Gives you this handy list.")
         print("download [link] - downloads a server profile locally.")
-        print("load [profile] [directory] - loads & installs a Forge Modpack Profile.")
-        print("server [profile] [directory] - for quick downloading Modpacks for Server Use.")
+        print(
+            "load [profile] [directory] - loads & installs a Forge Modpack Profile.")
+        print(
+            "server [profile] [directory] - for quick downloading Modpacks for Server Use.")
         continue
 
     if command[0] == "download":
         try:
             if not os.path.exists("./profiles/"):
                 os.mkdir("./profiles")
-        except:
+        except BaseException:
             continue
-                
+
         try:
             temp = requests.get(command[1])
-        except:
+        except BaseException:
             print("That download link is not valid.")
 
         print("Downloading from: " + command[1])
-        with open("./tempProfile.json","wb") as f1:
+        with open("./tempProfile.json", "wb") as f1:
             print("Extracting Profile...")
             f1.write(temp.content)
         f2 = open("./tempProfile.json")
         downloadData = json.load(f2)
         f2.close()
-        shutil.move("./tempProfile.json", "./profiles/" + downloadData["shortName"] + ".json")
-        print("Your profile, " + downloadData["shortName"] + ".json has been saved! You can load it using the load command.")
-        
+        shutil.move(
+            "./tempProfile.json",
+            "./profiles/" +
+            downloadData["shortName"] +
+            ".json")
+        print(
+            "Your profile, " +
+            downloadData["shortName"] +
+            ".json has been saved! You can load it using the load command.")
 
-        
     if command[0] == "server":
         print("Server.")
         if os.path.exists('./profiles/' + command[1] + ".json"):
@@ -160,8 +188,7 @@ while True:
                     print("This directory does not exist.")
                 else:
                     serverInstall(command[2])
-                
-    
+
     if command[0] == "load":
         if os.path.exists('./profiles/' + command[1] + ".json"):
             f1 = open('./profiles/' + command[1] + ".json")
@@ -171,12 +198,11 @@ while True:
                     if not os.path.exists(command[2]):
                         print("This directory does not exist.")
                         continue
-            except:
+            except BaseException:
                 appData = os.getenv('APPDATA')
-                mcDir = appData + "\.minecraft"
+                mcDir = appData + r"/.minecraft"
                 installMods(mcDir)
- 
+
         elif not os.path.exists('./profiles/' + command[1] + ".json"):
             print("This profile does not exist. Try again.")
             continue
-
