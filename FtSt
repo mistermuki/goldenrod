@@ -1,4 +1,4 @@
 !#/bin/bash
 
 isort main.py
-yapf --style yapf main.py
+black main.py
