@@ -113,7 +113,7 @@ print(r"| $$  | $$| $$\  $$$  \  $$$/    | $$  | $$ ")
 print(r"| $$  | $$| $$ \  $$   \  $/    /$$$$$$| $$$$$$$$")
 print(r"|__/  |__/|__/  \__/    \_/    |______/|________/")
 print(r"Version: 0.1")
-print(r"\n")
+print("\n")
 print(r"Anvil has successfully launched.")
 print(r"You can use the command, help for a list of commands")
 
