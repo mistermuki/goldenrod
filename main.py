@@ -178,10 +178,9 @@ while True:
             f1 = open("./profiles/" + command[1] + ".json")
             data = json.load(f1)
             try:
-                if command[2]:
-                    if not os.path.exists(command[2]):
-                        print("This directory does not exist.")
-                        continue
+                if command[2] and not os.path.exists(command[2]):
+                    print("This directory does not exist.")
+                    continue
             except BaseException:
                 appData = os.getenv("APPDATA")
                 mcDir = appData + r"/.minecraft"
