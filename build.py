@@ -1,14 +1,23 @@
-# Installs the requirements needed to build.
+import platform
 import subprocess
 
-subprocess.run(['pip3', 'install', '-r', 'requirements.txt'], shell=False)
+import isort
+
+subprocess.run(["pip3", "install", "-r", "requirements.txt"], shell=False)
 
 # Sorts all the src files.
-subprocess.run(['isort', 'src/*'])
+isort.code("src/*")
 print("All source files have been sorted successfully.")
 
 # Stylechecks all the src files.
-subprocess.run(['black', 'src/*'])
+subprocess.run(["python3", "-m", "black", "src/"])
+
+
+if platform.system() == "Linux":
+    print("Will not compile the exe because we are on Linux.")
+    exit()
 
 # Compiles Anvil into an .exe for Windows.
-subprocess.run(['pyinstaller', '--onefile', '--clean', '--name', 'Anvil', 'src/main.py'])
+subprocess.run(
+    ["pyinstaller", "--onefile", "--clean", "--name", "Anvil", "src/main.py"]
+)
