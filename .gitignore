@@ -4,3 +4,4 @@ build/
 dist/
 Anvil.spec
 src/__pycache__
+.idea/
