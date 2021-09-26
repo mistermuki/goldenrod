@@ -31,8 +31,6 @@ def installMods(_dir):
             time.sleep(0.1)
 
     print("Installing mods to mods Directory...")
-    # appData = os.getenv('APPDATA')
-    # mcDir = appData + "\.minecraft"
     modsDir = _dir + r"/mods"
 
     if not os.path.exists(modsDir):
@@ -47,7 +45,6 @@ def installMods(_dir):
         print("Creating mods Directory: " + modsDir)
         time.sleep(1)
 
-    # workDir = str(pathlib.Path().resolve())
     print("Loading files into mods folder...")
     for x in os.listdir("./jarCache/" + data["shortName"]):
         if x.endswith(".jar"):
@@ -76,14 +73,14 @@ def serverInstall(_dire):
             print("Creating JAR Cache:" + "./jarCache/" + str(data["shortName"]))
             time.sleep(0.3)
 
-        tempMod = requests.get(data["modList"][i][0]["link"])
+        temp_mod = requests.get(data["modList"][i][0]["link"])
         print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
-        cacheDirectory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
+        cache_directory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
         time.sleep(0.3)
 
-        with open(cacheDirectory, "wb") as f:
+        with open(cache_directory, "wb") as f:
             print("Saving " + i + "...")
-            f.write(tempMod.content)
+            f.write(temp_mod.content)
             print("Successfully saved: " + i)
             time.sleep(0.1)
 
