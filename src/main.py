@@ -19,37 +19,37 @@ def installMods(_dir):
             print("Creating JAR Cache:" + "./jarCache/" + str(data["shortName"]))
             time.sleep(0.3)
 
-        tempMod = requests.get(data["modList"][i][0]["link"])
+        temp_mod = requests.get(data["modList"][i][0]["link"])
         print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
-        cacheDirectory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
+        cache_directory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
         time.sleep(0.3)
 
-        with open(cacheDirectory, "wb") as f:
+        with open(cache_directory, "wb") as f:
             print("Saving " + i + "...")
-            f.write(tempMod.content)
+            f.write(temp_mod.content)
             print("Successfully saved: " + i)
             time.sleep(0.1)
 
     print("Installing mods to mods Directory...")
-    modsDir = _dir + r"/mods"
+    mods_dir = _dir + r"/mods"
 
-    if not os.path.exists(modsDir):
-        os.mkdir(modsDir)
-        print("Creating mods Directory: " + modsDir)
+    if not os.path.exists(mods_dir):
+        os.mkdir(mods_dir)
+        print("Creating mods Directory: " + mods_dir)
         time.sleep(1)
-    elif os.path.isdir(modsDir):
+    elif os.path.isdir(mods_dir):
         print("Cleaning mods Directory...")
         time.sleep(1)
-        shutil.rmtree(modsDir)
-        os.mkdir(modsDir)
-        print("Creating mods Directory: " + modsDir)
+        shutil.rmtree(mods_dir)
+        os.mkdir(mods_dir)
+        print("Creating mods Directory: " + mods_dir)
         time.sleep(1)
 
     print("Loading files into mods folder...")
     for x in os.listdir("./jarCache/" + data["shortName"]):
         if x.endswith(".jar"):
             print("Moving: " + x)
-            shutil.move("./jarCache/" + data["shortName"] + "/" + x, modsDir + "/" + x)
+            shutil.move("./jarCache/" + data["shortName"] + "/" + x, mods_dir + "/" + x)
             print("Succesfully moved: " + x)
             time.sleep(1)
 
