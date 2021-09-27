@@ -109,7 +109,7 @@ print(r"| $$__  $$| $$  $$$$ \  $$ $$/   | $$  | $$ ")
 print(r"| $$  | $$| $$\  $$$  \  $$$/    | $$  | $$ ")
 print(r"| $$  | $$| $$ \  $$   \  $/    /$$$$$$| $$$$$$$$")
 print(r"|__/  |__/|__/  \__/    \_/    |______/|________/")
-print(r"Version: 0.1")
+print(r"Version: 0.2.0")
 print("\n")
 print(r"Anvil has successfully launched.")
 print(r"You can use the command, help for a list of commands")
@@ -131,12 +131,12 @@ while True:
         try:
             if not os.path.exists("./profiles/"):
                 os.mkdir("./profiles")
-        except BaseException:
+        except FileNotFoundError:
             continue
 
         try:
             temp = requests.get(command[1])
-        except BaseException:
+        except FileNotFoundError:
             print("That download link is not valid.")
 
         print("Downloading from: " + command[1])
@@ -178,7 +178,7 @@ while True:
                 if command[2] and not os.path.exists(command[2]):
                     print("This directory does not exist.")
                     continue
-            except BaseException:
+            except FileNotFoundError:
                 appData = os.getenv("APPDATA")
                 mcDir = appData + r"/.minecraft"
                 installMods(mcDir)
