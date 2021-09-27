@@ -8,7 +8,7 @@ import requests
 
 
 def installMods(_dir):
-    """ "Handles installing mods from an Anvil profile to a client."""
+    """Handles installing mods from an Anvil profile to a client."""
     for i in data["modList"]:
         if not os.path.exists("./jarCache/"):
             os.mkdir("./jarCache/")
@@ -19,40 +19,37 @@ def installMods(_dir):
             print("Creating JAR Cache:" + "./jarCache/" + str(data["shortName"]))
             time.sleep(0.3)
 
-        tempMod = requests.get(data["modList"][i][0]["link"])
+        temp_mod = requests.get(data["modList"][i][0]["link"])
         print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
-        cacheDirectory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
+        cache_directory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
         time.sleep(0.3)
 
-        with open(cacheDirectory, "wb") as f:
+        with open(cache_directory, "wb") as f:
             print("Saving " + i + "...")
-            f.write(tempMod.content)
+            f.write(temp_mod.content)
             print("Successfully saved: " + i)
             time.sleep(0.1)
 
     print("Installing mods to mods Directory...")
-    # appData = os.getenv('APPDATA')
-    # mcDir = appData + "\.minecraft"
-    modsDir = _dir + r"/mods"
+    mods_dir = _dir + r"/mods"
 
-    if not os.path.exists(modsDir):
-        os.mkdir(modsDir)
-        print("Creating mods Directory: " + modsDir)
+    if not os.path.exists(mods_dir):
+        os.mkdir(mods_dir)
+        print("Creating mods Directory: " + mods_dir)
         time.sleep(1)
-    elif os.path.isdir(modsDir):
+    elif os.path.isdir(mods_dir):
         print("Cleaning mods Directory...")
         time.sleep(1)
-        shutil.rmtree(modsDir)
-        os.mkdir(modsDir)
-        print("Creating mods Directory: " + modsDir)
+        shutil.rmtree(mods_dir)
+        os.mkdir(mods_dir)
+        print("Creating mods Directory: " + mods_dir)
         time.sleep(1)
 
-    # workDir = str(pathlib.Path().resolve())
     print("Loading files into mods folder...")
     for x in os.listdir("./jarCache/" + data["shortName"]):
         if x.endswith(".jar"):
             print("Moving: " + x)
-            shutil.move("./jarCache/" + data["shortName"] + "/" + x, modsDir + "/" + x)
+            shutil.move("./jarCache/" + data["shortName"] + "/" + x, mods_dir + "/" + x)
             print("Succesfully moved: " + x)
             time.sleep(1)
 
@@ -65,7 +62,7 @@ def installMods(_dir):
 
 
 def serverInstall(_dire):
-    """ "Handles installing mods from an Anvil profile onto a server."""
+    """Handles installing mods from an Anvil profile onto a server."""
     for i in data["modList"]:
         if not os.path.exists("./jarCache/"):
             os.mkdir("./jarCache/")
@@ -76,14 +73,14 @@ def serverInstall(_dire):
             print("Creating JAR Cache:" + "./jarCache/" + str(data["shortName"]))
             time.sleep(0.3)
 
-        tempMod = requests.get(data["modList"][i][0]["link"])
+        temp_mod = requests.get(data["modList"][i][0]["link"])
         print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
-        cacheDirectory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
+        cache_directory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
         time.sleep(0.3)
 
-        with open(cacheDirectory, "wb") as f:
+        with open(cache_directory, "wb") as f:
             print("Saving " + i + "...")
-            f.write(tempMod.content)
+            f.write(temp_mod.content)
             print("Successfully saved: " + i)
             time.sleep(0.1)
 
@@ -112,8 +109,8 @@ print(r"| $$__  $$| $$  $$$$ \  $$ $$/   | $$  | $$ ")
 print(r"| $$  | $$| $$\  $$$  \  $$$/    | $$  | $$ ")
 print(r"| $$  | $$| $$ \  $$   \  $/    /$$$$$$| $$$$$$$$")
 print(r"|__/  |__/|__/  \__/    \_/    |______/|________/")
-print(r"Version: 0.1")
-print(r"\n")
+print(r"Version: 0.2.0")
+print("\n")
 print(r"Anvil has successfully launched.")
 print(r"You can use the command, help for a list of commands")
 
@@ -134,12 +131,12 @@ while True:
         try:
             if not os.path.exists("./profiles/"):
                 os.mkdir("./profiles")
-        except BaseException:
+        except FileNotFoundError:
             continue
 
         try:
             temp = requests.get(command[1])
-        except BaseException:
+        except FileNotFoundError:
             print("That download link is not valid.")
 
         print("Downloading from: " + command[1])
@@ -178,11 +175,10 @@ while True:
             f1 = open("./profiles/" + command[1] + ".json")
             data = json.load(f1)
             try:
-                if command[2]:
-                    if not os.path.exists(command[2]):
-                        print("This directory does not exist.")
-                        continue
-            except BaseException:
+                if command[2] and not os.path.exists(command[2]):
+                    print("This directory does not exist.")
+                    continue
+            except FileNotFoundError:
                 appData = os.getenv("APPDATA")
                 mcDir = appData + r"/.minecraft"
                 installMods(mcDir)
