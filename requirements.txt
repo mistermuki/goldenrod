@@ -1,4 +1,4 @@
 black
 isort
-pyinstaller
 requests
+cx_Freeze

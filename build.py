@@ -28,6 +28,5 @@ if platform.system() == "Linux":
     exit()
 
 # Compiles Anvil into an .exe for Windows.
-subprocess.run(
-    ["pyinstaller", "--onefile", "--clean", "--name", "Anvil", "src/main.py"]
-)
+if platform.system() != "Linux":
+    subprocess.run(["python", "setup.py", "build"])
