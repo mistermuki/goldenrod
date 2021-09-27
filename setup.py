@@ -11,7 +11,7 @@ target = Executable(script="src/anvil.py", base=base, icon="src/icon.ico")
 
 setup(
     name="Anvil",
-    version="0.2.0",
+    version="0.2.1",
     description="Anvil is a lightweight CLI Forge Profile Manager.",
     executables=[target],
     options={"build.exe": {}},
