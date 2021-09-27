@@ -178,7 +178,7 @@ while True:
                 if command[2] and not os.path.exists(command[2]):
                     print("This directory does not exist.")
                     continue
-            except FileNotFoundError:
+            except Exception:
                 appData = os.getenv("APPDATA")
                 mcDir = appData + r"/.minecraft"
                 installMods(mcDir)
