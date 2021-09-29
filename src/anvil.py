@@ -61,7 +61,7 @@ def installMods(_dir):
     sys.exit(0)
 
 
-def serverInstall(_dire):
+def serverInstall(_dir):
     """Handles installing mods from an Anvil profile onto a server."""
     for i in data["modList"]:
         if not os.path.exists("./jarCache/"):
@@ -88,7 +88,7 @@ def serverInstall(_dire):
     for x in os.listdir("./jarCache/" + data["shortName"]):
         if x.endswith(".jar"):
             print("Moving: " + x)
-            shutil.move("./jarCache/" + data["shortName"] + "/" + x, _dire + "/" + x)
+            shutil.move("./jarCache/" + data["shortName"] + "/" + x, _dir + "/" + x)
             print("Succesfully moved: " + x)
             time.sleep(1)
 
@@ -156,13 +156,9 @@ while True:
         )
 
     if command[0] == "server":
-        print("Server.")
         if os.path.exists("./profiles/" + command[1] + ".json"):
-            print("Server.")
             f1 = open("./profiles/" + command[1] + ".json")
-            print("Server.")
             data = json.load(f1)
-            print("Server.")
             if command[2]:
                 print("Server.")
                 if not os.path.exists(command[2]):
@@ -179,8 +175,13 @@ while True:
                     print("This directory does not exist.")
                     continue
             except FileNotFoundError:
-                appData = os.getenv("APPDATA")
-                mcDir = appData + r"/.minecraft"
+                if sys.platform.system() == "Linux":
+                    mcDir = r"~/.mineraft"
+
+                if sys.platform.system() == "Win32":
+                    appData = os.getenv("APPDATA")
+                    mcDir = appData + r"/.minecraft"
+
                 installMods(mcDir)
 
         elif not os.path.exists("./profiles/" + command[1] + ".json"):

@@ -3,9 +3,7 @@ import sys
 from cx_Freeze import Executable, setup
 
 # base="Win32GUI" should be used only for Windows GUI app
-base = None
-if sys.platform == "win32":
-    base = "Console"
+base = "Console"
 
 target = Executable(script="src/anvil.py", base=base, icon="src/icon.ico")
 

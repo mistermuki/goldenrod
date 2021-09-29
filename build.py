@@ -23,10 +23,8 @@ if platform.system() == "Linux":
 else:
     subprocess.run(["python", "-m", "black", "src/"])
 
+# Compiles Anvil into an executable.
 if platform.system() == "Linux":
-    print("Will not compile the exe because we are on Linux.")
-    exit()
-
-# Compiles Anvil into an .exe for Windows.
-if platform.system() != "Linux":
+    subprocess.run(["python3", "setup.py", "build"])
+else:
     subprocess.run(["python", "setup.py", "build"])
