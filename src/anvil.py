@@ -1,8 +1,10 @@
 import json
 import os
+import platform
 import shutil
 import sys
 import time
+from multiprocessing import Queue
 
 import requests
 
@@ -19,7 +21,7 @@ def installMods(_dir):
             print("Creating JAR Cache:" + "./jarCache/" + str(data["shortName"]))
             time.sleep(0.3)
 
-        temp_mod = requests.get(data["modList"][i][0]["link"])
+        temp_mod = requests.get(data["modList"][i][0]["link"], verify=True, timeout=20)
         print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
         cache_directory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
         time.sleep(0.3)
@@ -71,18 +73,43 @@ def serverInstall(_dir):
         if not os.path.exists("./jarCache/" + str(data["shortName"])):
             os.mkdir("./jarCache/" + str(data["shortName"]))
             print("Creating JAR Cache:" + "./jarCache/" + str(data["shortName"]))
-            time.sleep(0.3)
 
-        temp_mod = requests.get(data["modList"][i][0]["link"])
-        print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
-        cache_directory = "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
-        time.sleep(0.3)
+        try:
+            temp_mod = requests.get(
+                data["modList"][i][0]["link"], verify=True, timeout=25
+            )
+            print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
+            cache_directory = (
+                "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
+            )
 
-        with open(cache_directory, "wb") as f:
-            print("Saving " + i + "...")
-            f.write(temp_mod.content)
-            print("Successfully saved: " + i)
-            time.sleep(0.1)
+            with open(cache_directory, "wb") as f:
+                print("Saving " + i + "...")
+                f.write(temp_mod.content)
+                print("Successfully saved: " + i)
+        except ConnectionError:
+            try:
+                print(
+                    "Downloading "
+                    + str(i)
+                    + ".jar has failed. Attemping to download with HTTP Protocol."
+                )
+                temp_mod = requests.get(
+                    data["modList"][i][0]["link"], verify=False, timeout=25
+                )
+                print("Requesting: " + i + " from: " + data["modList"][i][0]["link"])
+                cache_directory = (
+                    "./jarCache/" + str(data["shortName"]) + "/" + str(i) + ".jar"
+                )
+
+                with open(cache_directory, "wb") as f:
+                    print("Saving " + i + "...")
+                    f.write(temp_mod.content)
+                    print("Successfully saved: " + i)
+            except ConnectionError:
+                print("Downloading " + str(i) + ".jar has failed with HTTPS & HTTP.")
+                time.sleep(5)
+                sys.exit(0)
 
     print("Loading files into mods folder...")
     for x in os.listdir("./jarCache/" + data["shortName"]):
@@ -90,8 +117,6 @@ def serverInstall(_dir):
             print("Moving: " + x)
             shutil.move("./jarCache/" + data["shortName"] + "/" + x, _dir + "/" + x)
             print("Succesfully moved: " + x)
-            time.sleep(1)
-
     print("Cleaning up jarCache...")
     shutil.rmtree("./jarCache/" + str(data["shortName"]))
     print("Cleaned up jarCache!")
@@ -109,7 +134,7 @@ print(r"| $$__  $$| $$  $$$$ \  $$ $$/   | $$  | $$ ")
 print(r"| $$  | $$| $$\  $$$  \  $$$/    | $$  | $$ ")
 print(r"| $$  | $$| $$ \  $$   \  $/    /$$$$$$| $$$$$$$$")
 print(r"|__/  |__/|__/  \__/    \_/    |______/|________/")
-print(r"Version: 0.2.0")
+print(r"Version: 0.3.0")
 print("\n")
 print(r"Anvil has successfully launched.")
 print(r"You can use the command, help for a list of commands")
@@ -121,9 +146,11 @@ while True:
     if command[0] == "help":
         print("help - Gives you this handy list.")
         print("download [link] - downloads a server profile locally.")
-        print("load [profile] [directory] - loads & installs a Forge Modpack Profile.")
         print(
-            "server [profile] [directory] - for quick downloading Modpacks for Server Use."
+            "load [profile]- loads & installs a Forge Modpack Profile automatically to the default Minecraft location."
+        )
+        print(
+            "server [profile] [directory] - loads & installs a Forge Modpack Profile automatically to defined directory."
         )
         continue
 
@@ -160,7 +187,6 @@ while True:
             f1 = open("./profiles/" + command[1] + ".json")
             data = json.load(f1)
             if command[2]:
-                print("Server.")
                 if not os.path.exists(command[2]):
                     print("This directory does not exist.")
                 else:
@@ -170,19 +196,17 @@ while True:
         if os.path.exists("./profiles/" + command[1] + ".json"):
             f1 = open("./profiles/" + command[1] + ".json")
             data = json.load(f1)
-            try:
-                if command[2] and not os.path.exists(command[2]):
-                    print("This directory does not exist.")
-                    continue
-            except FileNotFoundError:
-                if sys.platform.system() == "Linux":
-                    mcDir = r"~/.mineraft"
+            if platform.system() == "Linux":
+                userHome = os.getenv("HOME")
+                mcDir = userHome + "/.minecraft"
+                if not os.path.exists(mcDir + "/mods"):
+                    os.mkdir(mcDir + "/mods")
 
-                if sys.platform.system() == "Win32":
-                    appData = os.getenv("APPDATA")
-                    mcDir = appData + r"/.minecraft"
+            if platform.system() == "Win32":
+                appData = os.getenv("APPDATA")
+                mcDir = appData + r"/.minecraft"
 
-                installMods(mcDir)
+            installMods(mcDir)
 
         elif not os.path.exists("./profiles/" + command[1] + ".json"):
             print("This profile does not exist. Try again.")
