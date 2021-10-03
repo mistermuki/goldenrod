@@ -1,63 +1,164 @@
 #![feature(str_split_whitespace_as_str)]
-
+extern crate dirs;
 extern crate reqwest;
+extern crate stringr;
+use std::env;
 use std::fs;
 use std::fs::File;
 use std::io;
 use std::io::{stdin, stdout, Write};
-use std::str::SplitWhitespace;
+use std::path::Path;
 use std::string::ToString;
+use serde::{Serialize, Deserialize};
 
-fn main() {
-    let mut commandText = String::new();
-    println!("GOLDENROD RUST VERSION");
-    println!("VERSION 0.4.0");
+fn process_input() {
+    let mut command_text = String::new();
     let _ = stdout().flush();
     stdin()
-        .read_line(&mut commandText)
+        .read_line(&mut command_text)
         .expect("Did not enter a correct string");
-    if let Some('\n') = commandText.chars().next_back() {
-        commandText.pop();
+    if let Some('\n') = command_text.chars().next_back() {
+        command_text.pop();
     }
-    if let Some('\r') = commandText.chars().next_back() {
-        commandText.pop();
+    if let Some('\r') = command_text.chars().next_back() {
+        command_text.pop();
     }
 
-    let mut f = commandText.split_whitespace();
-    match f.as_str() {
-        download => {
-            f.next();
-            println!("Attempting to download from: {}", f.as_str());
-            downloadJSONProfile(f.as_str().to_string());
+    let first_command = command_text.split_whitespace().next().unwrap_or("");
+    let mut input_iter = command_text.split_whitespace();
+
+    match first_command {
+        "download" => {
+            input_iter.next();
+            println!("Attempting to download from: {}", input_iter.as_str());
+            download_jsonprofile(input_iter.as_str().to_string());
         }
-        load => {}
-        server => {}
-        help => {}
-        quit => {}
-        _ => println!("Not a valid command."),
+        "load" => {
+            input_iter.next();
+            let profile_name = input_iter.as_str();
+            println!("Attempting to load: {}.json", profile_name);
+            if Path::new(&format!("./profiles/{}.json", profile_name)).exists() {
+                println!(
+                    "Goldenrod Profile Loader: Installing for {}...",
+                    env::consts::OS
+                );
+                load_profile(env::consts::OS, profile_name.to_string())
+            } else {
+                println!("The Goldenrod Profile, {}, does not exist.", profile_name);
+                process_input();
+            }
+        }
+        "server" => {}
+        "help" => {}
+        "quit" => {}
+        _ => {
+            println!("'{}' is not a valid command.", input_iter.as_str());
+            process_input();
+        }
     }
 }
 
-fn downloadJSONProfile(Url: String) {
-    let resp = reqwest::blocking::get(Url).expect("request failed");
+fn download_mod(url: String){
+
+}
+
+fn download_jsonprofile(url: String) {
+    let resp = reqwest::blocking::get(url).expect("JSON Download Request Failed");
     println!("Goldenrod JSON Retriever: Download Request Succeeded");
-    let body = resp.text().expect("body invalid");
+    let body = resp.text().expect("Request Body Invalid");
     println!("Goldenrod JSON Retriever: Response Body Valid");
-    let mut out = File::create("tempName.json").expect("failed to create file");
+    let mut out = File::create("./profiles/tempName.json").expect("Failed to create file");
     println!("Goldenrod JSON Retriever: Successfully created JSON Temp File.");
-    io::copy(&mut body.as_bytes(), &mut out).expect("failed to copy content");
+    io::copy(&mut body.as_bytes(), &mut out).expect("Failed to copy content");
     println!("Goldenrod JSON Retriever: Successfully filled JSON Temp File.");
-    let file = fs::File::open("tempName.json").expect("file should open read only");
+    let file = fs::File::open("./profiles/tempName.json").expect("The JSON profile should open read only");
     let json: serde_json::Value =
-        serde_json::from_reader(file).expect("file should be proper JSON");
+        serde_json::from_reader(file).expect("The JSON profile should be proper JSON");
     let mut short_name: String = json
         .get("shortName")
-        .expect("file should have shortName key")
+        .expect("The JSON profile should have shortName key")
         .to_string();
     short_name = short_name.replace(r#"""#, "");
     println!(
         "Goldenrod JSON Retriever: Successfully downloaded {}.json",
         short_name
     );
-    fs::rename("tempName.json", format!("{}.json", short_name));
+    fs::rename("./profiles/tempName.json", format!("./profiles/{}.json", short_name))
+        .expect("Not able to rename tempName.json.");
+    println!(
+        "Use the 'load' command to install a profile! (ex. load {})",
+        short_name
+    );
+    process_input();
+}
+
+fn load_profile(os: &str, profile: String) {
+    match os {
+        "windows" => {
+            println!(
+                "Goldenrod Profile Loader: Checking if mods folder exists in default location..."
+            );
+            if Path::new(&format!(
+                "{}/.minecraft/mods",
+                dirs::data_dir().unwrap().display()
+            ))
+            .exists()
+            {
+                println!("Goldenrod Profile Loader: Mods folder exists...");
+                println!("Goldenrod Profile Loader: Beginning Mod Requests");
+                let file = fs::File::open(format!("./profiles/{}.json", profile)).expect("The JSON profile should open read only");
+                let json: serde_json::Value =
+                    serde_json::from_reader(file).expect("The JSON profile should be proper JSON");
+            } else {
+                println!("Goldenrod Profile Loader: Mods folder does not exist.");
+                println!("Goldenrod Profile Loader: If you have installed Minecraft in it's default location...");
+                println!("Goldenrod Profile Loader: ...double-check if you have Forge installed.");
+                println!("If you have Minecraft and Forge installed somewhere else, please use the server command.");
+                process_input();
+            }
+        }
+        "linux" => {}
+        _ => {
+            println!("This case is impossible to reach. If you have reached here, something terrible has happened")
+        }
+    }
+}
+
+fn main() {
+    println!(
+        r#"                       ,dPYb,         8I                                                         8I"#
+    );
+    println!(
+        r#"                       IP'`Yb         8I                                                         8I"#
+    );
+    println!(
+        r#"                       I8  8I         8I                                                         8I"#
+    );
+    println!(
+        r#"                       I8  8'         8I                                                         8I"#
+    );
+    println!(
+        r#",gggg,gg    ,ggggg,    I8 dP    ,gggg,8I   ,ggg,    ,ggg,,ggg,    ,gggggg,    ,ggggg,      ,gggg,8I"#
+    );
+    println!(
+        r#"dP"  "Y8I   dP"  "Y8ggg I8dP    dP"  "Y8I  i8" "8i  ,8" "8P" "8,   dP""""8I   dP"  "Y8ggg  dP"  "Y8I"#
+    );
+    println!(
+        r#"i8'    ,8I  i8'    ,8I   I8P    i8'    ,8I  I8, ,8I  I8   8I   8I  ,8'    8I  i8'    ,8I   i8'    ,8I"#
+    );
+    println!(
+        r#",d8,   ,d8I ,d8,   ,d8'  ,d8b,_ ,d8,   ,d8b, `YbadP' ,dP   8I   Yb,,dP     Y8,,d8,   ,d8'  ,d8,   ,d8b,"#
+    );
+    println!(
+        r#"P"Y8888P"888P"Y8888P"    8P'"Y88P"Y8888P"`Y8888P"Y8888P'   8I   `Y88P      `Y8P"Y8888P"    P"Y8888P"`Y8"#
+    );
+    println!(r#"   ,d8I'"#);
+    println!(r#" ,dP'8I                  VERSION 0.4.0"#);
+    println!(r#",8"  8I"#);
+    println!(r#"I8   8I"#);
+    println!(r#"`8, ,8I"#);
+    println!(r#"` Y8P""#);
+    println!("\nEnter your commands on the line below.");
+    println!("Feel free to use the 'help' command!");
+    process_input();
 }
