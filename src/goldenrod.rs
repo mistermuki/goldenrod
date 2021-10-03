@@ -2,6 +2,7 @@
 extern crate dirs;
 extern crate reqwest;
 extern crate stringr;
+use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs;
 use std::fs::File;
@@ -9,7 +10,6 @@ use std::io;
 use std::io::{stdin, stdout, Write};
 use std::path::Path;
 use std::string::ToString;
-use serde::{Serialize, Deserialize};
 
 fn process_input() {
     let mut command_text = String::new();
@@ -58,9 +58,7 @@ fn process_input() {
     }
 }
 
-fn download_mod(url: String){
-
-}
+fn download_mod(url: String) {}
 
 fn download_jsonprofile(url: String) {
     let resp = reqwest::blocking::get(url).expect("JSON Download Request Failed");
@@ -71,7 +69,8 @@ fn download_jsonprofile(url: String) {
     println!("Goldenrod JSON Retriever: Successfully created JSON Temp File.");
     io::copy(&mut body.as_bytes(), &mut out).expect("Failed to copy content");
     println!("Goldenrod JSON Retriever: Successfully filled JSON Temp File.");
-    let file = fs::File::open("./profiles/tempName.json").expect("The JSON profile should open read only");
+    let file =
+        fs::File::open("./profiles/tempName.json").expect("The JSON profile should open read only");
     let json: serde_json::Value =
         serde_json::from_reader(file).expect("The JSON profile should be proper JSON");
     let mut short_name: String = json
@@ -83,8 +82,11 @@ fn download_jsonprofile(url: String) {
         "Goldenrod JSON Retriever: Successfully downloaded {}.json",
         short_name
     );
-    fs::rename("./profiles/tempName.json", format!("./profiles/{}.json", short_name))
-        .expect("Not able to rename tempName.json.");
+    fs::rename(
+        "./profiles/tempName.json",
+        format!("./profiles/{}.json", short_name),
+    )
+    .expect("Not able to rename tempName.json.");
     println!(
         "Use the 'load' command to install a profile! (ex. load {})",
         short_name
@@ -106,7 +108,8 @@ fn load_profile(os: &str, profile: String) {
             {
                 println!("Goldenrod Profile Loader: Mods folder exists...");
                 println!("Goldenrod Profile Loader: Beginning Mod Requests");
-                let file = fs::File::open(format!("./profiles/{}.json", profile)).expect("The JSON profile should open read only");
+                let file = fs::File::open(format!("./profiles/{}.json", profile))
+                    .expect("The JSON profile should open read only");
                 let json: serde_json::Value =
                     serde_json::from_reader(file).expect("The JSON profile should be proper JSON");
             } else {
