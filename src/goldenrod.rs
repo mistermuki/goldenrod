@@ -246,9 +246,14 @@ fn server_profile(path: &str, profile: String) {
         let link: String = value[0]["link"].to_string().replace(r#"""#, "");
 
         let resp = reqwest::blocking::get(link).expect("JAR Download Request Failed");
-        let body = resp.text().expect("Request Body Invalid");
-        let mut out = File::create(format!("{}/{}.jar", path, key)).expect("Failed to create file");
-        io::copy(&mut body.as_bytes(), &mut out).expect("Failed to copy content");
+        let body = resp.bytes().expect("Request Bytes Invalid");
+        let mut out_stream = File::create(format!(
+            "{}/{}.jar",
+            path,
+            key
+        ))
+            .expect("Failed to create file");
+        out_stream.write(&*body).expect("Failed to write content.");
         println!("Goldenrod JAR Retriever: Successfully downloaded {}.", key);
         println!("Goldenrod Mod Installer: Successfully installed {}", key);
     }
