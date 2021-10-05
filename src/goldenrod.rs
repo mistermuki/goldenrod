@@ -6,7 +6,7 @@ use std::{env, time};
 use std::fs;
 use std::fs::File;
 use std::io;
-use std::io::{BufWriter, stdin, stdout, Write};
+use std::io::{stdin, stdout, Write};
 use std::path::Path;
 use std::process::exit;
 use std::string::ToString;
@@ -123,6 +123,7 @@ fn load_profile(os: &str, profile: String) {
 
                     let resp = reqwest::blocking::get(link).expect("JAR Download Request Failed");
                     let body = resp.bytes().expect("Request Bytes Invalid");
+                    let mut out_stream = File::create(format!("{}/.minecraft/mods/{}.jar", dirs::data_dir().unwrap().display(), key)).expect("Failed to create file");
                     out_stream.write(&*body).expect("Failed to write content.");
                     println!("Goldenrod JAR Retriever: Successfully downloaded {}.", key);
                     println!("Goldenrod Mod Installer: Successfully downloaded & installed {}", key);
