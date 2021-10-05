@@ -2,7 +2,6 @@
 extern crate dirs;
 extern crate reqwest;
 extern crate stringr;
-use std::{env, time};
 use std::fs;
 use std::fs::File;
 use std::io;
@@ -11,6 +10,7 @@ use std::path::Path;
 use std::process::exit;
 use std::string::ToString;
 use std::thread::sleep;
+use std::{env, time};
 
 fn process_input() {
     let mut command_text = String::new();
@@ -51,19 +51,34 @@ fn process_input() {
         }
         "server" => {
             input_iter.next();
-            let profile_name = input_iter.as_str();
+            println!("{}", input_iter.as_str());
+            let mut profile_iter = input_iter.clone();
+            let profile_name = profile_iter.next().unwrap_or("");
+            input_iter.next();
+            let path_location = input_iter.as_str();
             println!("Attempting to load: {}.json", profile_name);
             if Path::new(&format!("./profiles/{}.json", profile_name)).exists() {
-                println!(
-                    "Goldenrod Profile Loader: Server-type installation...");
-                server_profile("server", profile_name.to_string())
+                println!("Goldenrod Profile Loader: Server-type installation...");
+                server_profile(path_location, profile_name.to_string())
             } else {
                 println!("The Goldenrod Profile, {}, does not exist.", profile_name);
                 process_input();
             }
         }
-        "help" => {}
-        "quit" => {}
+        "help" => {
+            println!("Below is a list of the core Golderod commands:");
+            println!("help - The command you just used.");
+            println!("download [URL] - Downloads a JSON Goldenrod profile from the Web.");
+            println!("load [profile name] - Loads and installs the profile to your OS default Minecraft location.");
+            println!("server [profile name] [directory] - Loads and installs the profile to the given path.");
+            println!("quit - You already know what this does.");
+            process_input();
+        }
+        "quit" => {
+            println!("Thanks for using Goldenrod. See you soon.");
+            sleep(time::Duration::from_secs(2));
+            exit(1);
+        }
         _ => {
             println!("'{}' is not a valid command.", input_iter.as_str());
             process_input();
@@ -72,10 +87,9 @@ fn process_input() {
 }
 
 fn download_jsonprofile(url: String) {
-    if !Path::new("./profiles").exists(){
+    if !Path::new("./profiles").exists() {
         println!("Goldenrod JSON Retriever: Creating Profiles Folder..");
-        fs::create_dir("./profiles")
-            .expect("Failed to create profiles folder.")
+        fs::create_dir("./profiles").expect("Failed to create profiles folder.")
     }
     let resp = reqwest::blocking::get(url).expect("JSON Download Request Failed");
     println!("Goldenrod JSON Retriever: Download Request Succeeded");
@@ -116,89 +130,133 @@ fn load_profile(os: &str, profile: String) {
             println!(
                 "Goldenrod Profile Loader: Checking if mods folder exists in default location..."
             );
-            if Path::new(&format!(
+            if !Path::new(&format!(
                 "{}/.minecraft/mods",
                 dirs::data_dir().unwrap().display()
             ))
             .exists()
             {
-                println!("Goldenrod Profile Loader: Mods folder exists...");
-                println!("Goldenrod Profile Loader: Beginning Mod Requests");
-                let file = fs::File::open(format!("./profiles/{}.json", profile))
-                    .expect("The JSON profile should open read only");
-                let json: serde_json::Value =
-                    serde_json::from_reader(file).expect("The JSON profile should be proper JSON");
-
-                for (key, value) in json["modList"].as_object().unwrap() {
-                    println!("Goldenrod Mod Installer: Downloading {}...", key);
-                    let link : String = value[0]["link"].to_string().replace(r#"""#, "");
-
-                    let resp = reqwest::blocking::get(link).expect("JAR Download Request Failed");
-                    let body = resp.bytes().expect("Request Bytes Invalid");
-                    let mut out_stream = File::create(format!("{}/.minecraft/mods/{}.jar", dirs::data_dir().unwrap().display(), key)).expect("Failed to create file");
-                    out_stream.write(&*body).expect("Failed to write content.");
-                    println!("Goldenrod JAR Retriever: Successfully downloaded {}.", key);
-                    println!("Goldenrod Mod Installer: Successfully downloaded & installed {}", key);
-                    out_stream.flush().unwrap();
-                }
-
-
-                println!("{} has been successfully installed.", profile);
-                println!("Thank you for using Goldenrod.");
-                sleep(time::Duration::from_secs(5));
-                exit(1);
-
-            } else {
                 println!("Goldenrod Profile Loader: Mods folder does not exist.");
                 println!("Goldenrod Profile Loader: If you have installed Minecraft in it's default location...");
                 println!("Goldenrod Profile Loader: ...double-check if you have Forge installed.");
                 println!("If you have Minecraft and Forge installed somewhere else, please use the server command.");
             }
+            println!("Goldenrod Profile Loader: Mods folder exists...");
+            println!("Goldenrod Profile Loader: Beginning Mod Requests");
+            let file = fs::File::open(format!("./profiles/{}.json", profile))
+                .expect("The JSON profile should open read only");
+            let json: serde_json::Value =
+                serde_json::from_reader(file).expect("The JSON profile should be proper JSON");
+
+            for (key, value) in json["modList"].as_object().unwrap() {
+                println!("Goldenrod Mod Installer: Downloading {}...", key);
+                let link: String = value[0]["link"].to_string().replace(r#"""#, "");
+
+                let resp = reqwest::blocking::get(link).expect("JAR Download Request Failed");
+                let body = resp.bytes().expect("Request Bytes Invalid");
+                let mut out_stream = File::create(format!(
+                    "{}/.minecraft/mods/{}.jar",
+                    dirs::data_dir().unwrap().display(),
+                    key
+                ))
+                .expect("Failed to create file");
+                out_stream.write(&*body).expect("Failed to write content.");
+                println!("Goldenrod JAR Retriever: Successfully downloaded {}.", key);
+                println!("Goldenrod Mod Installer: Successfully installed {}", key);
+                out_stream.flush().unwrap();
+            }
+
+            println!("{} has been successfully installed.", profile);
+            println!("Thank you for using Goldenrod.");
+            sleep(time::Duration::from_secs(5));
+            exit(1);
         }
+
         "linux" => {
             println!(
                 "Goldenrod Profile Loader: Checking if mods folder exists in default location..."
             );
-            if Path::new(&format!(
+            if !Path::new(&format!(
                 "{}/.minecraft/mods",
                 dirs::home_dir().unwrap().display()
             ))
-                .exists()
+            .exists()
             {
-                println!("Goldenrod Profile Loader: Mods folder exists...");
-                println!("Goldenrod Profile Loader: Beginning Mod Requests");
-                let file = fs::File::open(format!("./profiles/{}.json", profile))
-                    .expect("The JSON profile should open read only");
-                let json: serde_json::Value =
-                    serde_json::from_reader(file).expect("The JSON profile should be proper JSON");
-
-                for (key, value) in json["modList"].as_object().unwrap() {
-                    println!("Goldenrod Mod Installer: Downloading {}...", key);
-                    let link: String = value[0]["link"].to_string().replace(r#"""#, "");
-
-                    let resp = reqwest::blocking::get(link).expect("JAR Download Request Failed");
-                    let body = resp.text().expect("Request Body Invalid");
-                    let mut out = File::create(format!("{}/.minecraft/mods/{}.jar", dirs::home_dir().unwrap().display(), key)).expect("Failed to create file");
-                    io::copy(&mut body.as_bytes(), &mut out).expect("Failed to copy content");
-                    println!("Goldenrod JAR Retriever: Successfully downloaded {}.", key);
-                    println!("Goldenrod Mod Installer: Successfully downloaded & installed {}", key);
-                }
-
-                println!("{} has been successfully installed.", profile);
-                println!("Thank you for using Goldenrod.");
-                sleep(time::Duration::from_secs(5));
-                exit(1);
-            } else {
                 println!("Goldenrod Profile Loader: Mods folder does not exist.");
                 println!("Goldenrod Profile Loader: If you have installed Minecraft in it's default location...");
                 println!("Goldenrod Profile Loader: ...double-check if you have Forge installed.");
                 println!("If you have Minecraft and Forge installed somewhere else, please use the server command.");
+                process_input();
             }
+
+            println!("Goldenrod Profile Loader: Mods folder exists...");
+            println!("Goldenrod Profile Loader: Beginning Mod Requests");
+            let file = fs::File::open(format!("./profiles/{}.json", profile))
+                .expect("The JSON profile should open read only");
+            let json: serde_json::Value =
+                serde_json::from_reader(file).expect("The JSON profile should be proper JSON");
+
+            for (key, value) in json["modList"].as_object().unwrap() {
+                println!("Goldenrod Mod Installer: Downloading {}...", key);
+                let link: String = value[0]["link"].to_string().replace(r#"""#, "");
+
+                let resp = reqwest::blocking::get(link).expect("JAR Download Request Failed");
+                let body = resp.text().expect("Request Body Invalid");
+                let mut out = File::create(format!(
+                    "{}/.minecraft/mods/{}.jar",
+                    dirs::home_dir().unwrap().display(),
+                    key
+                ))
+                .expect("Failed to create file");
+                io::copy(&mut body.as_bytes(), &mut out).expect("Failed to copy content");
+                println!("Goldenrod JAR Retriever: Successfully downloaded {}.", key);
+                println!("Goldenrod Mod Installer: Successfully installed {}", key);
+            }
+
+            println!("{} has been successfully installed.", profile);
+            println!("Thank you for using Goldenrod.");
+            sleep(time::Duration::from_secs(5));
+            exit(1);
         }
         _ => {
             println!("This case is impossible to reach. If you have reached here, something terrible has happened")
         }
     }
+}
+
+fn server_profile(path: &str, profile: String) {
+    if !Path::new(path).exists() {
+        println!(
+            "Goldenrod Profile Loader: The current path '{}' does not exist",
+            path
+        );
+        println!("Please ensure that the path exists before attempting to install there.");
+        process_input();
+    }
+
+    println!("Goldenrod Profile Loader: Path '{}' exists...", path);
+    println!("Goldenrod Profile Loader: Beginning Mod Requests");
+    let file = fs::File::open(format!("./profiles/{}.json", profile))
+        .expect("The JSON profile should open read only");
+    let json: serde_json::Value =
+        serde_json::from_reader(file).expect("The JSON profile should be proper JSON");
+
+    for (key, value) in json["modList"].as_object().unwrap() {
+        println!("Goldenrod Mod Installer: Downloading {}...", key);
+        let link: String = value[0]["link"].to_string().replace(r#"""#, "");
+
+        let resp = reqwest::blocking::get(link).expect("JAR Download Request Failed");
+        let body = resp.text().expect("Request Body Invalid");
+        let mut out = File::create(format!("{}/{}.jar", path, key)).expect("Failed to create file");
+        io::copy(&mut body.as_bytes(), &mut out).expect("Failed to copy content");
+        println!("Goldenrod JAR Retriever: Successfully downloaded {}.", key);
+        println!("Goldenrod Mod Installer: Successfully installed {}", key);
+    }
+
+    println!("{} has been successfully installed.", profile);
+    println!("Thank you for using Goldenrod.");
+    sleep(time::Duration::from_secs(5));
+    exit(1);
 }
 
 fn main() {
