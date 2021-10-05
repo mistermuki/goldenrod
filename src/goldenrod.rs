@@ -49,7 +49,19 @@ fn process_input() {
                 process_input();
             }
         }
-        "server" => {}
+        "server" => {
+            input_iter.next();
+            let profile_name = input_iter.as_str();
+            println!("Attempting to load: {}.json", profile_name);
+            if Path::new(&format!("./profiles/{}.json", profile_name)).exists() {
+                println!(
+                    "Goldenrod Profile Loader: Server-type installation...");
+                server_profile("server", profile_name.to_string())
+            } else {
+                println!("The Goldenrod Profile, {}, does not exist.", profile_name);
+                process_input();
+            }
+        }
         "help" => {}
         "quit" => {}
         _ => {
