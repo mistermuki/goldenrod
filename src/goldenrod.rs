@@ -6,7 +6,7 @@ use std::{env, time};
 use std::fs;
 use std::fs::File;
 use std::io;
-use std::io::{stdin, stdout, Write};
+use std::io::{BufWriter, stdin, stdout, Write};
 use std::path::Path;
 use std::process::exit;
 use std::string::ToString;
@@ -122,12 +122,13 @@ fn load_profile(os: &str, profile: String) {
                     let link : String = value[0]["link"].to_string().replace(r#"""#, "");
 
                     let resp = reqwest::blocking::get(link).expect("JAR Download Request Failed");
-                    let body = resp.text().expect("Request Body Invalid");
-                    let mut out = File::create(format!("{}/.minecraft/mods/{}.jar", dirs::data_dir().unwrap().display(), key)).expect("Failed to create file");
-                    io::copy(&mut body.as_bytes(), &mut out).expect("Failed to copy content");
+                    let body = resp.bytes().expect("Request Bytes Invalid");
+                    out_stream.write(&*body).expect("Failed to write content.");
                     println!("Goldenrod JAR Retriever: Successfully downloaded {}.", key);
                     println!("Goldenrod Mod Installer: Successfully downloaded & installed {}", key);
+                    out_stream.flush().unwrap();
                 }
+
 
                 println!("{} has been successfully installed.", profile);
                 println!("Thank you for using Goldenrod.");
