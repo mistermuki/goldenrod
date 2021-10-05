@@ -293,7 +293,7 @@ fn main() {
         r#"P"Y8888P"888P"Y8888P"    8P'"Y88P"Y8888P"`Y8888P"Y8888P'   8I   `Y88P      `Y8P"Y8888P"    P"Y8888P"`Y8"#
     );
     println!(r#"   ,d8I'"#);
-    println!(r#" ,dP'8I                  VERSION 0.4.0"#);
+    println!(r#" ,dP'8I                  VERSION 0.4.1"#);
     println!(r#",8"  8I"#);
     println!(r#"I8   8I"#);
     println!(r#"`8, ,8I"#);
