@@ -1,8 +1,6 @@
-profiles/
-jarCache/
-build/
-dist/
-Anvil.spec
-src/__pycache__
+Cargo.lock
+target
 .idea/
-venv/
+.vscode/
+.run/
+profiles/

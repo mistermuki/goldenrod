@@ -1,4 +1,3 @@
-# Anvil
-[![DeepSource](https://deepsource.io/gh/mistermuki/Anvil.svg/?label=active+issues&show_trend=true&token=pE-0tExsKNxdDE1hTK99H5Sq)](https://deepsource.io/gh/mistermuki/Anvil/?ref=repository-badge)
+# goldenrod
 
-Anvil is a CLI based Forge Mod Manager. It should allow you to sync with a server's modlist.
+Goldenrod is a lightweigh CLI Based Forge Autosync tool.
