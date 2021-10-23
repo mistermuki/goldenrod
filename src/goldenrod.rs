@@ -201,16 +201,17 @@ fn load_profile(os: &str, profile: String) {
                 let link: String = value[0]["link"].to_string().replace(r#"""#, "");
 
                 let resp = reqwest::blocking::get(link).expect("JAR Download Request Failed");
-                let body = resp.text().expect("Request Body Invalid");
-                let mut out = File::create(format!(
+                let body = resp.bytes().expect("Request Bytes Invalid");
+                let mut out_stream = File::create(format!(
                     "{}/.minecraft/mods/{}.jar",
                     dirs::home_dir().unwrap().display(),
                     key
                 ))
                 .expect("Failed to create file");
-                io::copy(&mut body.as_bytes(), &mut out).expect("Failed to copy content");
+                out_stream.write(&*body).expect("Failed to write content.");
                 println!("Goldenrod JAR Retriever: Successfully downloaded {}.", key);
                 println!("Goldenrod Mod Installer: Successfully installed {}", key);
+                out_stream.flush().unwrap();
             }
 
             println!("{} has been successfully installed.", profile);
@@ -247,12 +248,8 @@ fn server_profile(path: &str, profile: String) {
 
         let resp = reqwest::blocking::get(link).expect("JAR Download Request Failed");
         let body = resp.bytes().expect("Request Bytes Invalid");
-        let mut out_stream = File::create(format!(
-            "{}/{}.jar",
-            path,
-            key
-        ))
-            .expect("Failed to create file");
+        let mut out_stream =
+            File::create(format!("{}/{}.jar", path, key)).expect("Failed to create file");
         out_stream.write(&*body).expect("Failed to write content.");
         println!("Goldenrod JAR Retriever: Successfully downloaded {}.", key);
         println!("Goldenrod Mod Installer: Successfully installed {}", key);
